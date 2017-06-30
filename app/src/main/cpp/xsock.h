@@ -5,14 +5,17 @@
 extern "C" {
 #endif
 
+#include <stdlib.h>
 #include <sys/socket.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <stdint.h>
+#include <pthread.h>
 
+#define true 1
 
 typedef struct Message Message;
 typedef struct Room Room;
@@ -30,7 +33,7 @@ struct Message{
 struct RoomMember{
     __be32 ip;
     __be16 port;
-    char name[10];
+    char *name;
     RoomMember *next;
 };
 
@@ -40,11 +43,13 @@ struct Room{
     int curMember;
     RoomMember *members;
     RoomMember *host;
+
 };
 
 struct RoomListener{
     void (*onEnterMember)(RoomMember *);
     void (*onLeaveMember)(RoomMember *);
+    void (*onError)(const char *);
 };
 
 
