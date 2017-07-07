@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_start_server).setOnClickListener(this);
         findViewById(R.id.send_broadcast).setOnClickListener(this);
         findViewById(R.id.start_client).setOnClickListener(this);
+        findViewById(R.id.start_Receive).setOnClickListener(this);
+        findViewById(R.id.start_send).setOnClickListener(this);
 
         ListView lv = (ListView) findViewById(R.id.lv_infos);
 
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public native void broadcastMsg(String sendMsg);
     public native void startServer(String name);
     public native void startClient();
+    public native void send(String sendMsg);
+    public native void receive();
+
     private Handler handler;
     public void onLog(String log){
         adapter.addData(log);
@@ -109,6 +114,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         startClient();
                     }
                 }.start();
+                break;
+            case R.id.start_Receive:
+                new Thread(){
+                    @Override
+                    public void run() {
+                        receive();
+                    }
+                }.start();
+                break;
+            case R.id.start_send:
+                count++;
+                send("test send"+count);
                 break;
         }
     }

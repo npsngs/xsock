@@ -380,4 +380,72 @@ void receiveBroadcast(Room *room) {
 
 }
 
+void receiveMsg(Room *room) {
+    char tmp[1024];
+    room->fd_in = socket(AF_INET, SOCK_DGRAM, 0);
+    if(room->fd_in == -1){
+        sprintf(tmp, "socket error :%d" ,errno);
+        room->listener->onError(tmp);
+        return;
+    }
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("172.28.77.4");
+    addr.sin_port = htons(55556);
+    socklen_t len = sizeof(addr);
+
+    int ret = bind(room->fd_in, (struct sockaddr*)&addr, len);
+    if(ret == -1){
+        sprintf(tmp, "bind socket error :%d" ,errno);
+        room->listener->onError(tmp);
+        return;
+    }
+
+
+    sprintf(tmp, "start receive[%s:%d]", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+    room->listener->onPrintLog(tmp);
+
+    char bf[1024];
+    while(true){
+        memset(&addr, 0, sizeof(addr));
+        len = sizeof(addr);
+        size_t ret = recvfrom(room->fd_in, bf, 1024, 0, (struct sockaddr*)&addr, &len);
+        if(ret < 0){
+            sprintf(tmp, "receive error :%d" ,errno);
+            return;
+        }else{
+            sprintf(tmp, "from[%s:%d]: %s", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), bf);
+        }
+
+        room->listener->onPrintLog(tmp);
+    }
+}
+
+void sendMsg(Room *room, const char *str) {
+   if( room->fd_out < 0){
+       room->fd_out = socket(AF_INET, SOCK_DGRAM, 0);
+       if(room->fd_out == -1){
+           room->listener->onError("socket error");
+           return;
+       }
+   }
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr =inet_addr("172.28.77.4");
+    addr.sin_port = htons(55556);
+    socklen_t len = sizeof(addr);
+    char bf[128];
+    size_t ret = sendto(room->fd_broadcast_out, str, strlen(str), 0, (struct sockaddr*)&addr, len);
+    if(ret < 0){
+        sprintf(bf, "send error :%d" ,errno);
+    }else{
+        sprintf(bf, "to[%s:%d]: %s", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port),str);
+    }
+    room->listener->onPrintLog(bf);
+}
+
 

@@ -96,6 +96,9 @@ extern int openSocket(__be32 ip, __be16 port);
 
 extern void sendBroadcast(Room *room,const char *str);
 extern void receiveBroadcast(Room *room);
+
+extern void receiveMsg(Room *room);
+extern void sendMsg(Room *room,const char *str);
 //设置非阻塞
 static void setnonblocking(int sockfd);
 
