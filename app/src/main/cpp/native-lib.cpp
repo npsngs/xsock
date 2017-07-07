@@ -72,9 +72,6 @@ Java_com_forthe_xsock_MainActivity_startServer(JNIEnv *env, jobject instance, js
     room->listener = listener;
     receiveBroadcast(room);
 
-
-
-
     //startServer(room, listener);
     env->ReleaseStringUTFChars(name_, name);
 }
