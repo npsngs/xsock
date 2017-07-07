@@ -409,9 +409,8 @@ void receiveMsg(Room *room) {
 
     char bf[1024];
     while(true){
-        memset(&addr, 0, sizeof(addr));
-        len = sizeof(addr);
-        size_t ret = recvfrom(room->fd_in, bf, 1024, 0, (struct sockaddr*)&addr, &len);
+        memset(bf, 0, sizeof(bf));
+        ssize_t ret = recvfrom(room->fd_in, bf, 1024, 0, (struct sockaddr*)&addr, &len);
         if(ret < 0){
             sprintf(tmp, "receive error :%d" ,errno);
             return;
@@ -435,11 +434,11 @@ void sendMsg(Room *room, const char *str) {
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr =inet_addr("172.28.77.4");
+    addr.sin_addr.s_addr = inet_addr("172.28.77.4");
     addr.sin_port = htons(55556);
     socklen_t len = sizeof(addr);
     char bf[128];
-    size_t ret = sendto(room->fd_broadcast_out, str, strlen(str), 0, (struct sockaddr*)&addr, len);
+    size_t ret = sendto(room->fd_out, str, strlen(str), 0, (struct sockaddr*)&addr, len);
     if(ret < 0){
         sprintf(bf, "send error :%d" ,errno);
     }else{
